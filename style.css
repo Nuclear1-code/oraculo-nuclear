@@ -1,0 +1,54 @@
+body {
+  font-family: 'Arial', sans-serif;
+  background: url('https://images.unsplash.com/photo-1518098268026-4e89f1a2cd8e') no-repeat center center fixed;
+  background-size: cover;
+  color: white;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  background: rgba(0, 0, 0, 0.75);
+  padding: 30px;
+  max-width: 700px;
+  margin: 40px auto;
+  border-radius: 10px;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.form input {
+  width: 100%;
+  padding: 10px;
+  margin: 6px 0;
+  border-radius: 5px;
+  border: none;
+}
+
+button {
+  background-color: #00c853;
+  color: white;
+  font-size: 18px;
+  padding: 10px 20px;
+  margin-top: 10px;
+  width: 100%;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #00e676;
+}
+
+.resultado {
+  background: #1b1b1b;
+  padding: 15px;
+  border-radius: 5px;
+  margin-top: 15px;
+  color: #fff;
+  font-size: 16px;
+}

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Oráculo Nuclear PWA</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#00c853" />
+</head>
+<body>
+  <div class="container">
+    <h1>⚽ Oráculo Nuclear de Apuestas</h1>
+    <p>Rellena los datos y deja que el algoritmo destruya las casas de apuestas.</p>
+    <div class="form">
+      <input type="text" id="local" placeholder="Equipo Local" />
+      <input type="text" id="visitante" placeholder="Equipo Visitante" />
+
+      <h3>Rendimiento del Local:</h3>
+      <input type="number" id="winL" placeholder="Ganados" />
+      <input type="number" id="drawL" placeholder="Empatados" />
+      <input type="number" id="lossL" placeholder="Perdidos" />
+      <input type="number" step="0.01" id="avgGoalsL" placeholder="Goles a favor" />
+      <input type="number" step="0.01" id="avgAgainstL" placeholder="Goles en contra" />
+
+      <h3>Rendimiento del Visitante:</h3>
+      <input type="number" id="winV" placeholder="Ganados" />
+      <input type="number" id="drawV" placeholder="Empatados" />
+      <input type="number" id="lossV" placeholder="Perdidos" />
+      <input type="number" step="0.01" id="avgGoalsV" placeholder="Goles a favor" />
+      <input type="number" step="0.01" id="avgAgainstV" placeholder="Goles en contra" />
+
+      <button onclick="analizar()">🔍 Analizar</button>
+    </div>
+    <pre id="resultado" class="resultado"></pre>
+  </div>
+  <script src="script.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js');
+    }
+  </script>
+</body>
+</html>
