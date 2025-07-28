@@ -1,0 +1,209 @@
+git clone https://github.com/TU_USUARIO/oraculo-nuclear.git
+cd oraculo-nuclear
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Oráculo Nuclear PWA</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#00c853" />
+</head>
+<body>
+  <div class="container">
+    <h1>⚽ Oráculo Nuclear de Apuestas</h1>
+    <p>Rellena los datos y deja que el algoritmo destruya las casas de apuestas.</p>
+    <div class="form">
+      <input type="text" id="local" placeholder="Equipo Local" />
+      <input type="text" id="visitante" placeholder="Equipo Visitante" />
+
+      <h3>Rendimiento del Local:</h3>
+      <input type="number" id="winL" placeholder="Ganados" />
+      <input type="number" id="drawL" placeholder="Empatados" />
+      <input type="number" id="lossL" placeholder="Perdidos" />
+      <input type="number" step="0.01" id="avgGoalsL" placeholder="Goles a favor" />
+      <input type="number" step="0.01" id="avgAgainstL" placeholder="Goles en contra" />
+
+      <h3>Rendimiento del Visitante:</h3>
+      <input type="number" id="winV" placeholder="Ganados" />
+      <input type="number" id="drawV" placeholder="Empatados" />
+      <input type="number" id="lossV" placeholder="Perdidos" />
+      <input type="number" step="0.01" id="avgGoalsV" placeholder="Goles a favor" />
+      <input type="number" step="0.01" id="avgAgainstV" placeholder="Goles en contra" />
+
+      <button onclick="analizar()">🔍 Analizar</button>
+    </div>
+    <pre id="resultado" class="resultado"></pre>
+  </div>
+  <script src="script.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js');
+    }
+  </script>
+</body>
+</html>
+{
+  "name": "Oráculo Deportivo Nuclear",
+  "short_name": "Oráculo",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#00c853",
+  "icons": [{
+    "src": "icon.png",
+    "sizes": "192x192",
+    "type": "image/png"
+  }]
+}
+function analizar() {
+    const local = document.getElementById('local').value;
+    const visitante = document.getElementById('visitante').value;
+
+    const winL = parseInt(document.getElementById('winL').value);
+    const drawL = parseInt(document.getElementById('drawL').value);
+    const lossL = parseInt(document.getElementById('lossL').value);
+    const avgGoalsL = parseFloat(document.getElementById('avgGoalsL').value);
+    const avgAgainstL = parseFloat(document.getElementById('avgAgainstL').value);
+
+    const winV = parseInt(document.getElementById('winV').value);
+    const drawV = parseInt(document.getElementById('drawV').value);
+    const lossV = parseInt(document.getElementById('lossV').value);
+    const avgGoalsV = parseFloat(document.getElementById('avgGoalsV').value);
+    const avgAgainstV = parseFloat(document.getElementById('avgAgainstV').value);
+
+    if (!local || !visitante || isNaN(winL) || isNaN(drawL) || isNaN(lossL) ||
+        isNaN(avgGoalsL) || isNaN(avgAgainstL) || isNaN(winV) || isNaN(drawV) ||
+        isNaN(lossV) || isNaN(avgGoalsV) || isNaN(avgAgainstV)) {
+        alert("Completa todos los campos correctamente.");
+        return;
+    }
+
+    const partidosL = winL + drawL + lossL;
+    const partidosV = winV + drawV + lossV;
+
+    const pGanL = winL / partidosL;
+    const pEmpL = drawL / partidosL;
+    const pPerL = lossL / partidosL;
+
+    const pGanV = winV / partidosV;
+    const pEmpV = drawV / partidosV;
+    const pPerV = lossV / partidosV;
+
+    const fuerzaLocal = ((pGanL + pPerV) / 2);
+    const fuerzaEmpate = ((pEmpL + pEmpV) / 2);
+    const fuerzaVisitante = ((pGanV + pPerL) / 2);
+
+    const expectedGoals = (avgGoalsL + avgAgainstV + avgGoalsV + avgAgainstL) / 4;
+
+    let resultado = "🏆 Predicción:\n";
+    resultado += ` - % Local: ${(fuerzaLocal * 100).toFixed(1)}%\n`;
+    resultado += ` - % Empate: ${(fuerzaEmpate * 100).toFixed(1)}%\n`;
+    resultado += ` - % Visitante: ${(fuerzaVisitante * 100).toFixed(1)}%\n`;
+
+    let tipo = "No clara";
+
+    if (fuerzaEmpate > fuerzaLocal && fuerzaEmpate > fuerzaVisitante && fuerzaEmpate >= 0.5) {
+        tipo = "Empate";
+    } else if (Math.abs(fuerzaEmpate - fuerzaLocal) <= 0.05 &&
+               Math.abs(fuerzaEmpate - fuerzaVisitante) <= 0.05) {
+        tipo = "Empate";
+    } else if (fuerzaLocal >= 0.55 && (fuerzaLocal - Math.max(fuerzaVisitante, fuerzaEmpate)) >= 0.10) {
+        tipo = local;
+    } else if (fuerzaVisitante >= 0.55 && (fuerzaVisitante - Math.max(fuerzaLocal, fuerzaEmpate)) >= 0.10) {
+        tipo = visitante;
+    }
+
+    resultado += `➡️ Resultado estimado: ${tipo}\n`;
+    resultado += `🎯 Goles estimados: ${expectedGoals.toFixed(2)}\n`;
+
+    let guia = "⚠️ Zona de riesgo (no apostar)";
+    if (expectedGoals <= 1.25) guia = "✅ Under 1.5";
+    else if (expectedGoals >= 1.75 && expectedGoals < 2.25) guia = "✅ Over 1.5";
+    else if (expectedGoals >= 2.75 && expectedGoals < 3.25) guia = "✅ Over 2.5";
+    else if (expectedGoals >= 3.75 && expectedGoals < 4.25) guia = "✅ Over 3.5";
+    else if (expectedGoals >= 4.75 && expectedGoals < 5.25) guia = "✅ Over 4.5";
+    else if (expectedGoals >= 5.75) guia = "✅ Over 5.5";
+
+    resultado += `🧠 Guía de apuesta por goles: ${guia}`;
+    document.getElementById("resultado").textContent = resultado;
+}
+self.addEventListener('install', function(e) {
+  e.waitUntil(
+    caches.open('oraculo-store').then(function(cache) {
+      return cache.addAll([
+        '/',
+        '/index.html',
+        '/style.css',
+        '/script.js',
+        '/manifest.json'
+      ]);
+    })
+  );
+});
+
+self.addEventListener('fetch', function(e) {
+  e.respondWith(
+    caches.match(e.request).then(function(response) {
+      return response || fetch(e.request);
+    })
+  );
+});
+
+body {
+  font-family: 'Arial', sans-serif;
+  background: url('https://images.unsplash.com/photo-1518098268026-4e89f1a2cd8e') no-repeat center center fixed;
+  background-size: cover;
+  color: white;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  background: rgba(0, 0, 0, 0.75);
+  padding: 30px;
+  max-width: 700px;
+  margin: 40px auto;
+  border-radius: 10px;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.form input {
+  width: 100%;
+  padding: 10px;
+  margin: 6px 0;
+  border-radius: 5px;
+  border: none;
+}
+
+button {
+  background-color: #00c853;
+  color: white;
+  font-size: 18px;
+  padding: 10px 20px;
+  margin-top: 10px;
+  width: 100%;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #00e676;
+}
+
+.resultado {
+  background: #1b1b1b;
+  padding: 15px;
+  border-radius: 5px;
+  margin-top: 15px;
+  color: #fff;
+  font-size: 16px;
+}aquí
+git add .
+git commit -m "Primera bomba nuclear lanzada"
+git push origin main
